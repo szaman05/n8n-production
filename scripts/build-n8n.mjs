@@ -20,7 +20,6 @@ const excludeTestController =
 	process.env.CI === 'true' && process.env.INCLUDE_TEST_CONTROLLER !== 'true';
 
 // Disable verbose output and force color only if not in CI
-$.verbose = !isCI;
 process.env.FORCE_COLOR = isCI ? '0' : '1';
 
 const scriptDir = path.dirname(new URL(import.meta.url).pathname);
