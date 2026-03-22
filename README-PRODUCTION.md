@@ -42,12 +42,14 @@ Create PostgreSQL database in Dokploy:
 ### Environment Variables
 ```bash
 DB_TYPE=postgresdb
-DB_HOST=n8n-db  # Dokploy service name
+DB_HOST=n8n-db-euovlt  # Actual Dokploy hostname
 DB_PORT=5432
 DB_NAME=n8n-db
 DB_USER=n8n-user
-DB_PASSWORD=your_dokploy_db_password
+DB_PASSWORD=2XwLPkJIIq632NCp83QL
 ```
+
+**Connection URL**: `postgresql://n8n-user:2XwLPkJIIq632NCp83QL@n8n-db-euovlt:5432/n8n-db`
 
 ## 🐳 Docker Commands
 

@@ -27,15 +27,17 @@ N8N_BASIC_AUTH_PASSWORD=your-secure-password
 ### Database Configuration (PostgreSQL)
 ```
 DB_TYPE=postgresdb
-DB_HOST=n8n-db  # Dokploy service name
+DB_HOST=n8n-db-euovlt  # Actual Dokploy hostname
 DB_PORT=5432
 DB_NAME=n8n-db
 DB_USER=n8n-user
-DB_PASSWORD=2XwLPkJllq632NCp83QL
+DB_PASSWORD=2XwLPkJIIq632NCp83QL
 DB_SSL_MODE=prefer
 ```
 
-**Note**: Use the actual connection details provided by Dokploy after creating the database service. The values above match your setup form.
+**Connection URL**: `postgresql://n8n-user:2XwLPkJIIq632NCp83QL@n8n-db-euovlt:5432/n8n-db`
+
+**Note**: Use the exact connection details from your Dokploy PostgreSQL service. The hostname `n8n-db-euovlt` is the actual internal service name.
 
 ### Optional: Redis for Queue
 ```
