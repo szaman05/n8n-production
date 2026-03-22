@@ -8,7 +8,7 @@ ARG N8N_VERSION=2.13.0
 FROM node:${NODE_VERSION}-alpine AS builder
 
 # Install build dependencies
-RUN apk add --no-cache python3 make g++
+RUN apk add --no-cache python3 make g++ git
 
 WORKDIR /usr/local/lib/node_modules/n8n
 
@@ -18,7 +18,7 @@ COPY . .
 # Build n8n using their official build script
 RUN npm install -g pnpm@10.22.0 && \
     pnpm install --frozen-lockfile && \
-    pnpm build:deploy
+    node scripts/build-n8n.mjs
 
 # Production stage
 FROM node:${NODE_VERSION}-alpine AS production
