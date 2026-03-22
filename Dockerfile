@@ -17,7 +17,7 @@ COPY . .
 
 # Build n8n using their official build script
 RUN npm install -g pnpm@10.22.0 && \
-    pnpm install --frozen-lockfile && \
+    pnpm install --frozen-lockfile --ignore-scripts && \
     node scripts/build-n8n.mjs
 
 # Production stage
