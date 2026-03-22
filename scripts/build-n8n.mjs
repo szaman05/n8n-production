@@ -8,7 +8,8 @@
  * 4. Create a pruned production deployment in 'compiled'
  */
 
-import { $, echo, fs, chalk } from 'zx';
+import { execSync } from 'node:child_process';
+import { echo, fs, chalk } from 'zx';
 import path from 'path';
 
 // Check if running in a CI environment
@@ -97,22 +98,16 @@ startTimer('package_build');
 
 echo(chalk.yellow('INFO: Running pnpm install and build...'));
 try {
-	const installProcess = $`cd "${config.rootDir}" && pnpm install --frozen-lockfile`;
-	installProcess.pipe(process.stdout);
-	await installProcess;
+	execSync(`cd "${config.rootDir}" && pnpm install --frozen-lockfile`, { stdio: 'inherit' });
 
-	const buildProcess = $`cd "${config.rootDir}" && pnpm build --summarize`;
-	buildProcess.pipe(process.stdout);
-	await buildProcess;
+	execSync(`cd "${config.rootDir}" && pnpm build --summarize`, { stdio: 'inherit' });
 
 	// Generate third-party licenses for production builds
 	// Skip with N8N_SKIP_LICENSES=true for CI test builds
 	if (process.env.N8N_SKIP_LICENSES !== 'true') {
 		echo(chalk.yellow('INFO: Generating third-party licenses...'));
 		try {
-			const licenseProcess = $`cd "${config.rootDir}" && node scripts/generate-third-party-licenses.mjs`;
-			licenseProcess.pipe(process.stdout);
-			await licenseProcess;
+			execSync(`cd "${config.rootDir}" && node scripts/generate-third-party-licenses.mjs`, { stdio: 'inherit' });
 			echo(chalk.green('✅ Third-party licenses generated successfully'));
 		} catch (error) {
 			echo(chalk.yellow('⚠️  Warning: Third-party license generation failed, continuing build...'));
@@ -143,11 +138,11 @@ printDivider();
 echo(chalk.yellow('INFO: Performing pre-deploy cleanup on package.json files...'));
 
 // Find and backup package.json files
-const packageJsonFiles = await $`cd "${config.rootDir}" && find . -name "package.json" \
+const packageJsonFiles = execSync(`cd "${config.rootDir}" && find . -name "package.json" \
 --not -path "./node_modules/*" \
 --not -path "*/node_modules/*" \
 --not -path "./compiled/*" \
---not -path "*/compiled/*"`;
+--not -path "*/compiled/*"`, { encoding: 'utf8' }).trim().split('\n');
 
 // Backup all package.json files
 // This is only needed locally, not in CI
@@ -160,7 +155,7 @@ if (process.env.CI !== 'true') {
 	}
 }
 // Run FE trim script
-await $`cd "${config.rootDir}" && node .github/scripts/trim-fe-packageJson.js`;
+execSync(`cd "${config.rootDir}" && node .github/scripts/trim-fe-packageJson.js`, { stdio: 'inherit' });
 echo(chalk.yellow('INFO: Performing selective patch cleanup...'));
 
 const packageJsonPath = path.join(config.rootDir, 'package.json');
@@ -213,7 +208,7 @@ if (excludeTestController) {
 	echo(chalk.gray('  - Excluded test controller from packages/cli/package.json'));
 }
 
-await $`cd "${config.rootDir}" && NODE_ENV=production DOCKER_BUILD=true pnpm --filter=n8n --prod --legacy deploy --no-optional ./compiled`;
+execSync(`cd "${config.rootDir}" && NODE_ENV=production DOCKER_BUILD=true pnpm --filter=n8n --prod --legacy deploy --no-optional ./compiled`, { stdio: 'inherit' });
 await fs.ensureDir(config.compiledTaskRunnerDir);
 
 echo(
@@ -222,7 +217,7 @@ echo(
 	),
 );
 
-await $`cd "${config.rootDir}" && NODE_ENV=production DOCKER_BUILD=true pnpm --filter=@n8n/task-runner --prod --legacy deploy --no-optional "${config.compiledTaskRunnerDir}"`;
+execSync(`cd "${config.rootDir}" && NODE_ENV=production DOCKER_BUILD=true pnpm --filter=@n8n/task-runner --prod --legacy deploy --no-optional "${config.compiledTaskRunnerDir}"`, { stdio: 'inherit' });
 
 const packageDeployTime = getElapsedTime('package_deploy');
 
