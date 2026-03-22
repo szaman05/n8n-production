@@ -27,13 +27,15 @@ N8N_BASIC_AUTH_PASSWORD=your-secure-password
 ### Database Configuration (PostgreSQL)
 ```
 DB_TYPE=postgresdb
-DB_HOST=your-postgres-host
+DB_HOST=n8n-db  # Dokploy service name
 DB_PORT=5432
-DB_NAME=n8n
-DB_USER=your-postgres-user
-DB_PASSWORD=your-postgres-password
+DB_NAME=n8n-db
+DB_USER=n8n-user
+DB_PASSWORD=2XwLPkJllq632NCp83QL
 DB_SSL_MODE=prefer
 ```
+
+**Note**: Use the actual connection details provided by Dokploy after creating the database service. The values above match your setup form.
 
 ### Optional: Redis for Queue
 ```
@@ -54,26 +56,25 @@ N8N_LOG_FILE_MAX_FILES=10
 
 ## Database Setup
 
-### Option 1: Managed PostgreSQL (Recommended)
-Use a managed service like:
+### Option 1: Dokploy PostgreSQL (Recommended)
+Create PostgreSQL database directly in Dokploy:
+
+1. **Create Database Service**:
+   - Name: `n8n-db`
+   - Database Name: `n8n-db`
+   - User: `n8n-user`
+   - Docker Image: `postgres:18`
+
+2. **Get Connection Details**:
+   After creation, Dokploy will provide the connection URL and credentials.
+
+### Option 2: Managed PostgreSQL
+Use external services like:
 - Railway
 - Supabase
 - PlanetScale
 - AWS RDS
 - DigitalOcean Managed Database
-
-### Option 2: Self-Hosted PostgreSQL
-```bash
-# Using Docker
-docker run -d \
-  --name postgres-n8n \
-  -e POSTGRES_DB=n8n \
-  -e POSTGRES_USER=n8n \
-  -e POSTGRES_PASSWORD=secure_password \
-  -p 5432:5432 \
-  -v postgres_data:/var/lib/postgresql/data \
-  postgres:15-alpine
-```
 
 ### Database Initialization
 n8n will automatically create the necessary tables on first startup.
@@ -107,6 +108,9 @@ Mount volume for data persistence:
 ### 5. Port Configuration
 - **Internal Port**: 5678
 - **External Port**: 80 (HTTP) / 443 (HTTPS with SSL)
+
+### 6. Service Dependencies
+Add `n8n-db` as a dependency in Dokploy to ensure the database starts before n8n.
 
 ## SSL Configuration
 

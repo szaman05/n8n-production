@@ -32,26 +32,21 @@ See `DEPLOYMENT.md` for detailed configuration options.
 
 ## 🗄️ Database Setup
 
-### PostgreSQL (Recommended)
-```bash
-# Using Docker for testing
-docker run -d \
-  --name postgres-n8n \
-  -e POSTGRES_DB=n8n \
-  -e POSTGRES_USER=n8n \
-  -e POSTGRES_PASSWORD=secure_password \
-  -p 5432:5432 \
-  postgres:15-alpine
-```
+### PostgreSQL (Dokploy)
+Create PostgreSQL database in Dokploy:
+- **Service Name**: `n8n-db`
+- **Database Name**: `n8n-db`
+- **User**: `n8n-user`
+- **Password**: Generate secure password
 
 ### Environment Variables
 ```bash
 DB_TYPE=postgresdb
-DB_HOST=your-postgres-host
+DB_HOST=n8n-db  # Dokploy service name
 DB_PORT=5432
-DB_NAME=n8n
-DB_USER=n8n
-DB_PASSWORD=your_password
+DB_NAME=n8n-db
+DB_USER=n8n-user
+DB_PASSWORD=your_dokploy_db_password
 ```
 
 ## 🐳 Docker Commands
