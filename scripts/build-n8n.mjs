@@ -8,7 +8,7 @@
  * 4. Create a pruned production deployment in 'compiled'
  */
 
-import { $, echo, fs, chalk, quote } from 'zx';
+import { $, echo, fs, chalk } from 'zx';
 import path from 'path';
 
 // Check if running in a CI environment
