@@ -1,0 +1,106 @@
+# Production Docker ignore file
+# Reduces build context for faster, smaller builds
+
+# Git and version control
+.git
+.gitignore
+.gitattributes
+.git-blame-ignore-revs
+
+# Dependencies and package managers
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Development and testing files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.env.local
+.env.development
+.env.test
+coverage
+.nyc_output
+test
+tests
+**/*.test.js
+**/*.test.ts
+**/*.spec.js
+**/*.spec.ts
+
+# Build artifacts (keep only what we need)
+!packages/cli/bin/n8n
+!compiled
+!THIRD_PARTY_LICENSES.md
+
+# Documentation and markdown
+*.md
+!README.md
+docs
+
+# Assets and media
+assets
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.ico
+
+# Logs and temporary files
+logs
+*.log
+tmp
+temp
+.tmp
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Development tools
+.eslintcache
+.stylelintcache
+.biomeignore
+.prettierrc*
+.editorconfig
+
+# CI/CD
+.github
+.gitlab-ci.yml
+.travis.yml
+codecov.yml
+
+# Docker files (except the ones we need)
+!docker-compose.yml
+!Dockerfile
+docker/
+.dockerignore
+
+# Scripts and tools (except build scripts)
+scripts/
+!scripts/build-n8n.mjs
+!scripts/dockerize-n8n.mjs
+
+# Development packages
+packages/*/test
+packages/*/tests
+packages/*/docs
+packages/*/examples
+packages/*/src/**/*.test.ts
+packages/*/src/**/*.spec.ts
+
+# Keep only essential compiled files
+!packages/cli/dist
+!packages/core/dist
+!packages/workflow/dist
+!packages/*/dist
