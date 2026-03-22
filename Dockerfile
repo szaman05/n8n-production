@@ -1,31 +1,24 @@
 # Production Dockerfile for n8n deployment on Dokploy
-# Multi-stage build for optimized production image
+# Based on n8n's official Dockerfile with production optimizations
 
 ARG NODE_VERSION=24.13.1
 ARG N8N_VERSION=2.13.0
 
-# Build stage
+# Build stage - use n8n's existing build approach
 FROM node:${NODE_VERSION}-alpine AS builder
 
 # Install build dependencies
-RUN apk add --no-cache python3 make g++ libc6-compat
+RUN apk add --no-cache python3 make g++
 
-WORKDIR /app
+WORKDIR /usr/local/lib/node_modules/n8n
 
-# Copy package files
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY patches/ ./
-COPY scripts/ ./
+# Copy the entire n8n source for building
+COPY . .
 
-# Install pnpm and dependencies
-RUN npm install -g pnpm@10.22.0
-RUN pnpm install --frozen-lockfile
-
-# Copy source code
-COPY packages/ ./packages/
-
-# Build the application
-RUN pnpm build:deploy
+# Build n8n using their official build script
+RUN npm install -g pnpm@10.22.0 && \
+    pnpm install --frozen-lockfile && \
+    pnpm build:deploy
 
 # Production stage
 FROM node:${NODE_VERSION}-alpine AS production
@@ -37,21 +30,22 @@ RUN apk add --no-cache dumb-init curl
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S n8n -u 1001
 
-WORKDIR /app
+WORKDIR /home/node
 
-# Copy built application
-COPY --from=builder --chown=n8n:nodejs /app/compiled /app/compiled
-COPY --from=builder --chown=n8n:nodejs /app/packages/cli/bin/n8n /app/n8n
-COPY --from=builder --chown=n8n:nodejs /app/THIRD_PARTY_LICENSES.md /app/
+# Copy built application from builder
+COPY --from=builder /usr/local/lib/node_modules/n8n /usr/local/lib/node_modules/n8n
+COPY --from=builder /usr/local/lib/node_modules/n8n/packages/cli/bin/n8n /usr/local/bin/n8n
+COPY --from=builder /usr/local/lib/node_modules/n8n/THIRD_PARTY_LICENSES.md /usr/local/lib/node_modules/n8n/
 
-# Install and rebuild native dependencies
-RUN cd /app/compiled && \
+# Rebuild native dependencies for production
+RUN cd /usr/local/lib/node_modules/n8n && \
     npm rebuild sqlite3 isolated-vm && \
     npm install --production
 
-# Create necessary directories
+# Create necessary directories and set permissions
 RUN mkdir -p /home/node/.n8n && \
-    chown -R n8n:nodejs /home/node/.n8n /app
+    chown -R node:node /home/node && \
+    rm -rf /root/.npm /tmp/*
 
 # Environment variables
 ENV NODE_ENV=production
@@ -60,7 +54,6 @@ ENV N8N_HOST=0.0.0.0
 ENV N8N_PORT=5678
 ENV N8N_PROTOCOL=http
 ENV WEBHOOK_URL=http://localhost:5678/
-ENV N8N_BASIC_AUTH_ACTIVE=false
 ENV N8N_USER_FOLDER=/home/node/.n8n
 ENV SHELL=/bin/sh
 
@@ -72,8 +65,8 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 EXPOSE 5678
 
 # Switch to non-root user
-USER n8n
+USER node
 
 # Entrypoint
 ENTRYPOINT ["dumb-init", "--"]
-CMD ["node", "/app/n8n"]
+CMD ["n8n"]

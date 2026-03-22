@@ -1,5 +1,5 @@
 # Production Docker ignore file
-# Reduces build context for faster, smaller builds
+# Optimized for n8n build process
 
 # Git and version control
 .git
@@ -25,21 +25,13 @@ pnpm-debug.log*
 .env.test
 coverage
 .nyc_output
-test
-tests
-**/*.test.js
-**/*.test.ts
-**/*.spec.js
-**/*.spec.ts
 
-# Build artifacts (keep only what we need)
-!packages/cli/bin/n8n
-!compiled
-!THIRD_PARTY_LICENSES.md
-
-# Documentation and markdown
+# Documentation and markdown (keep essentials)
 *.md
 !README.md
+!README-PRODUCTION.md
+!DEPLOYMENT.md
+!ENV-REFERENCE.md
 docs
 
 # Assets and media
@@ -80,27 +72,17 @@ Thumbs.db
 .travis.yml
 codecov.yml
 
-# Docker files (except the ones we need)
+# Docker files (keep the ones we need)
 !docker-compose.yml
 !Dockerfile
 docker/
-.dockerignore
+!.dockerignore.prod
 
-# Scripts and tools (except build scripts)
+# Keep essential n8n files
+package.json
+pnpm-lock.yaml
+pnpm-workspace.yaml
+patches/
 scripts/
-!scripts/build-n8n.mjs
-!scripts/dockerize-n8n.mjs
-
-# Development packages
-packages/*/test
-packages/*/tests
-packages/*/docs
-packages/*/examples
-packages/*/src/**/*.test.ts
-packages/*/src/**/*.spec.ts
-
-# Keep only essential compiled files
-!packages/cli/dist
-!packages/core/dist
-!packages/workflow/dist
-!packages/*/dist
+packages/
+THIRD_PARTY_LICENSES.md
