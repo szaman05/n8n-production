@@ -99,7 +99,7 @@ echo(chalk.yellow('INFO: Running pnpm install and build...'));
 try {
 	execSync(`cd "${config.rootDir}" && pnpm install --frozen-lockfile`, { stdio: 'inherit' });
 
-	execSync(`cd "${config.rootDir}" && pnpm build --summarize`, { stdio: 'inherit' });
+	execSync(`cd "${config.rootDir}" && npx turbo run build --summarize`, { stdio: 'inherit' });
 
 	// Generate third-party licenses for production builds
 	// Skip with N8N_SKIP_LICENSES=true for CI test builds
